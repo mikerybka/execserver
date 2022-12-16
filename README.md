@@ -11,7 +11,7 @@ NOT FOR PRODUCTION USE
 ## Install
 
 ```bash
-go install github.com/mikerybka/execserver@latest
+go install github.com/mikerybka/execserver/cmd/execserver@latest
 ```
 
 ## Setup
