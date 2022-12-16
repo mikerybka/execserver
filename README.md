@@ -1,6 +1,8 @@
 # execserver
 
-`execserver` is a command line application that executes 
+`execserver` is a command line application that executes arbitrary Go code.
+
+NOT FOR PRODUCTION USE
 
 ## Dependencies
 
