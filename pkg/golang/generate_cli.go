@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+
+	"github.com/library-development/go-nameconv"
 )
 
 // GenerateCLI geneates a simple Go CLI app that only calls a single func.
@@ -16,6 +18,8 @@ func GenerateCLI(srcDir, pkg, funcName, outFile string) error {
 	}
 	importMap := ImportMap{}
 	importMap.AddPackage(pkg)
+	importMap.AddPackage("encoding/json")
+	importMap.AddPackage("os")
 	for _, input := range funcSignature.Inputs {
 		importMap.AddPackage(input.Type.Pkg)
 	}
@@ -31,8 +35,18 @@ func GenerateCLI(srcDir, pkg, funcName, outFile string) error {
 	importMap.Write(&b)
 	b.WriteString("\nfunc main() {\n")
 	b.WriteString("\tvar input struct {\n")
-
+	for _, input := range funcSignature.Inputs {
+		n := nameconv.ParsePascalCase(input.Name)
+		b.WriteString("\t\t")
+		b.WriteString(n.PascalCase())
+		b.WriteString(" ")
+		b.WriteString(input.Type.Name)
+		b.WriteString(" `json:\"")
+		b.WriteString(n.SnakeCase())
+		b.WriteString("\"\n")
+	}
 	b.WriteString("\t}\n")
 	b.WriteString("}\n")
+	b.WriteString("\t\n")
 	return os.WriteFile(outFile, b.Bytes(), os.ModePerm)
 }
