@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/library-development/go-nameconv"
 )
@@ -46,7 +48,54 @@ func GenerateCLI(srcDir, pkg, funcName, outFile string) error {
 		b.WriteString("\"\n")
 	}
 	b.WriteString("\t}\n")
+	b.WriteString("\tjson.NewDecoder(os.Stdin).Decode(&input)\n")
+	b.WriteString("\t")
+	if len(funcSignature.Outputs) > 0 {
+		for i := range funcSignature.Outputs {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString("out")
+			b.WriteString(strconv.Itoa(i + 1))
+		}
+		b.WriteString(" := ")
+	}
+	p, ok := importMap.Resolve(pkg)
+	if !ok {
+		panic("package not found")
+	}
+	b.WriteString(p)
+	b.WriteString(".")
+	b.WriteString(funcName)
+	b.WriteString("(")
+	for i := range funcSignature.Inputs {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString("input.")
+		n := nameconv.ParsePascalCase(funcSignature.Inputs[i].Name)
+		b.WriteString(n.PascalCase())
+	}
+	b.WriteString(")\n")
+	b.WriteString("\tvar output struct {\n")
+	for _, output := range funcSignature.Outputs {
+		b.WriteString("\t\t")
+		b.WriteString(strings.Title(output.Name))
+		b.WriteString(" ")
+		b.WriteString(output.Type.Name)
+		b.WriteString(" `json:\"")
+		b.WriteString(output.Name)
+		b.WriteString("\"`\n")
+	}
+	b.WriteString("\t}\n")
+	for i := range funcSignature.Outputs {
+		b.WriteString("\toutput.Out")
+		b.WriteString(strconv.Itoa(i + 1))
+		b.WriteString(" = out")
+		b.WriteString(strconv.Itoa(i + 1))
+		b.WriteString("\n")
+	}
+	b.WriteString("\tjson.NewEncoder(os.Stdout).Encode(output)\n")
 	b.WriteString("}\n")
-	b.WriteString("\t\n")
 	return os.WriteFile(outFile, b.Bytes(), os.ModePerm)
 }

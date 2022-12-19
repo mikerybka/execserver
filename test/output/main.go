@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-
-	"github.com/mikerybka/execserver/test/pkg/hello"
+	hello "github.com/mikerybka/execserver/test/pkg/hello"
+	json "encoding/json"
+	os "os"
 )
 
 func main() {

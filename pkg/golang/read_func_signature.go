@@ -1,10 +1,12 @@
 package golang
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"path/filepath"
+	"strconv"
 )
 
 // ReadFuncSignature reads the function signature of a function in a package.
@@ -28,6 +30,7 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 				if fn, ok := d.(*ast.FuncDecl); ok {
 					if fn.Recv == nil {
 						if fn.Name.Name == funcName {
+							fmt.Println("found")
 							for _, f := range fn.Type.Params.List {
 								for _, n := range f.Names {
 									typeID, err := BuildID(pkg, imports, f.Type)
@@ -42,14 +45,29 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 
 								}
 							}
+							outID := 0
 							for _, f := range fn.Type.Results.List {
-								for _, n := range f.Names {
+								if len(f.Names) == 0 {
+									outID++
 									typeID, err := BuildID(pkg, imports, f.Type)
 									if err != nil {
 										return nil, err
 									}
 									field := Field{
-										Name: n.Name,
+										Name: "out" + strconv.Itoa(outID),
+										Type: typeID,
+									}
+									sig.Outputs = append(sig.Outputs, field)
+									continue
+								}
+								for range f.Names {
+									outID++
+									typeID, err := BuildID(pkg, imports, f.Type)
+									if err != nil {
+										return nil, err
+									}
+									field := Field{
+										Name: "out" + strconv.Itoa(outID),
 										Type: typeID,
 									}
 									sig.Outputs = append(sig.Outputs, field)
