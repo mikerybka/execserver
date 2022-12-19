@@ -58,4 +58,8 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = cmd.Start()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("start: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
 }
