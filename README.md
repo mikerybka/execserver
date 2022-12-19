@@ -6,7 +6,7 @@ NOT FOR PRODUCTION USE
 
 ## Dependencies
 
-`execserver` depends on the `go` command being available in the PATH.
+`execserver` depends on the `go` and `goimports` commands being available in the PATH.
 
 ## Install
 
