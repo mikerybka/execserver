@@ -49,12 +49,7 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	err = stdin.Close()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("close: %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-	_, err = io.Copy(w, stdout)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("copy: %s", err.Error()), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("stdin close: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	err = cmd.Start()
@@ -62,4 +57,10 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("start: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
+	b, err := io.ReadAll(stdout)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("read: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
 }
