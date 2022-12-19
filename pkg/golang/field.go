@@ -1,6 +1,8 @@
 package golang
 
+import "github.com/library-development/go-nameconv"
+
 type Field struct {
-	Name string
+	Name nameconv.Name
 	Type ID
 }

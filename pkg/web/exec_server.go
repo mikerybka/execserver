@@ -14,7 +14,6 @@ import (
 type ExecServer struct {
 	AuthDir   string
 	SourceDir string
-	BinDir    string
 }
 
 func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +46,12 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "encode", http.StatusInternalServerError)
 		return
 	}
+	err = stdin.Close()
+	if err != nil {
+		http.Error(w, "close", http.StatusInternalServerError)
+		return
+	}
+	err = cmd.Start()
 	_, err = io.Copy(w, stdout)
 	if err != nil {
 		http.Error(w, "copy", http.StatusInternalServerError)

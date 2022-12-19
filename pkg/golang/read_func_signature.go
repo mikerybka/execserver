@@ -1,12 +1,13 @@
 package golang
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"path/filepath"
 	"strconv"
+
+	"github.com/library-development/go-nameconv"
 )
 
 // ReadFuncSignature reads the function signature of a function in a package.
@@ -30,7 +31,6 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 				if fn, ok := d.(*ast.FuncDecl); ok {
 					if fn.Recv == nil {
 						if fn.Name.Name == funcName {
-							fmt.Println("found")
 							for _, f := range fn.Type.Params.List {
 								for _, n := range f.Names {
 									typeID, err := BuildID(pkg, imports, f.Type)
@@ -38,7 +38,7 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 										return nil, err
 									}
 									field := Field{
-										Name: n.Name,
+										Name: nameconv.Name{Words: []string{n.Name}},
 										Type: typeID,
 									}
 									sig.Inputs = append(sig.Inputs, field)
@@ -54,7 +54,7 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 										return nil, err
 									}
 									field := Field{
-										Name: "out" + strconv.Itoa(outID),
+										Name: nameconv.Name{Words: []string{"out" + strconv.Itoa(outID)}},
 										Type: typeID,
 									}
 									sig.Outputs = append(sig.Outputs, field)
@@ -67,7 +67,7 @@ func ReadFuncSignature(srcDir, pkg, funcName string) (*FuncSignature, error) {
 										return nil, err
 									}
 									field := Field{
-										Name: "out" + strconv.Itoa(outID),
+										Name: nameconv.Name{Words: []string{"out" + strconv.Itoa(outID)}},
 										Type: typeID,
 									}
 									sig.Outputs = append(sig.Outputs, field)

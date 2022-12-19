@@ -9,7 +9,7 @@ import (
 func main() {
 	srcDir := "../../../"
 	pkg := "github.com/mikerybka/execserver/test/pkg/hello"
-	fn := "Hello"
+	fn := "Echo"
 	mainFile := "test/output/main.go"
 	err := golang.GenerateCLI(srcDir, pkg, fn, mainFile)
 	if err != nil {

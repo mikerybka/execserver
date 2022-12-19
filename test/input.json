@@ -1,0 +1,7 @@
+{
+    "Pkg": "github.com/mikerybka/execserver/test/pkg/hello",
+    "Func": "Echo",
+    "Inputs": {
+        "s":"hedfasdfasdfay"
+    }
+}
