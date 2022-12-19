@@ -52,10 +52,10 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("close: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
-	err = cmd.Start()
 	_, err = io.Copy(w, stdout)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("copy: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
+	err = cmd.Start()
 }
