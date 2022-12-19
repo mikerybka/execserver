@@ -32,6 +32,7 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cmd := exec.Command("go", "run", mainFile)
+	cmd.Dir = s.SourceDir
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("stdin pipe: %s", err.Error()), http.StatusInternalServerError)
