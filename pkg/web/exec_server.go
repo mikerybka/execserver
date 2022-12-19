@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os/exec"
@@ -33,28 +34,28 @@ func (s *ExecServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cmd := exec.Command("go", "run", mainFile)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		http.Error(w, "stdin pipe", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("stdin pipe: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		http.Error(w, "stdout pipe", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("stdout pipe: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	err = json.NewEncoder(stdin).Encode(req.Inputs)
 	if err != nil {
-		http.Error(w, "encode", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("encode: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	err = stdin.Close()
 	if err != nil {
-		http.Error(w, "close", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("close: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	err = cmd.Start()
 	_, err = io.Copy(w, stdout)
 	if err != nil {
-		http.Error(w, "copy", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("copy: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 }
